@@ -1,0 +1,43 @@
+# 'type' parameter includes multiple and cohort. 
+# In type single, the first model in 'models' is run.
+# In type cohort, the prediction is not run and the cohort and cdm subset generators are run if their parameters are set to yes.
+run:
+  type: "multiple"
+  external_validation: "No"
+  validation_subgroup: "No"
+  cohort_generator: "No"
+  cohort_subgroup_generator: "No"
+  cdm_subset_generator: "No"
+  models:
+  - LR
+  - RF
+  - AB
+  - GB
+  - NB
+  
+# If the target dataset is not in BQ, it must be removed from the config file. If the bg is not found, the system checks the db automatically.  
+bq:
+  credentials: "/Users/behzadn/.config/gcloud/application_default_credentials.json"
+  driverPath: "/Users/behzadn/SimbaJDBCDriverforGoogleBigQuery42_1.2.22.1026"
+  projectId: "boussard"
+  defaultDataset: "cdm_prolonged_opioid"
+db:
+  dbms: "postgresql"
+  server: "localhost"
+  port: 5742
+  user: "behzadn"
+  password: "1111"
+
+cdm:
+  target_database_schema: "`som-nero-phi-boussard.cdm_prolonged_opioid`"
+  cohort_table: "cohort"
+  target_cohort_id: 1
+  outcome_cohort_id: 2
+  diabetes_cohort_id: 3
+  depression_cohort_id: 4
+  obesity_cohort_id: 5
+  vocabulary_database_schema: "`boussard.cdm_prolonged_opioid`"
+  cdm_database_schema: "`boussard.cdm_prolonged_opioid`"
+  cdm_database_name: "STARR-OMOP"
+
+
