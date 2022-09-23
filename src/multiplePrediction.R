@@ -44,7 +44,6 @@ populationSettings <- createStudyPopulationSettings(
   includeAllOutcomes = TRUE
 )
 
-#sampleSettings = createSampleSettings(type = "underSample")
 sampleSettings = createSampleSettings()
 
 splitSettings = createDefaultSplitSetting(
@@ -95,44 +94,6 @@ getModelDesignList <- function(config){
       oobScore = list(FALSE),
       nJobs = list(NULL),
       classWeight = list(NULL),
-      seed = 13
-    )
-  )
-  
-  modelDesignSVMRBF <- createModelDesign(
-    targetId = config$cdm$target_cohort_id,
-    outcomeId = config$cdm$outcome_cohort_id,
-    restrictPlpDataSettings = createRestrictPlpDataSettings(),
-    populationSettings = populationSettings,
-    covariateSettings = covariateSettings,
-    featureEngineeringSettings = createFeatureEngineeringSettings(),
-    sampleSettings = sampleSettings,
-    splitSettings = splitSettings,
-    preprocessSettings = createPreprocessSettings(),
-    modelSettings = setSVM(kernel = list("rbf"))
-  )
-  
-  
-  modelDesignSVMLinear <- createModelDesign(
-    targetId = config$cdm$target_cohort_id,
-    outcomeId = config$cdm$outcome_cohort_id,
-    restrictPlpDataSettings = createRestrictPlpDataSettings(),
-    populationSettings = populationSettings,
-    covariateSettings = covariateSettings,
-    featureEngineeringSettings = createFeatureEngineeringSettings(),
-    sampleSettings = sampleSettings,
-    splitSettings = splitSettings,
-    preprocessSettings = createPreprocessSettings(),
-    modelSettings = setSVM(
-      C = list(1),
-      kernel = list("linear"),
-      degree = list(1),
-      gamma = list("scale"),
-      coef0 = list(0),
-      shrinking = list(TRUE),
-      tol = list(0.001),
-      classWeight = list(NULL),
-      cacheSize = 500,
       seed = 13
     )
   )
@@ -205,7 +166,7 @@ runMultiplePrediction <- function(config, logger) {
     modelDesignList = getModelDesignList(config),
     onlyFetchData = F,
     logSettings = createLogSettings(),
-    saveDirectory =  "./PlpMultiOutput"
+    saveDirectory =  file.path(getwd(), "PlpMultiOutput")
   )
 }
 
