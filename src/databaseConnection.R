@@ -59,6 +59,7 @@ getDatabaseDetails <- function(connectionDetails, config, logger){
     connectionDetails = connectionDetails,
     cdmDatabaseSchema = config$cdm$cdm_database_schema,
     cdmDatabaseName = config$cdm$cdm_database_name,
+    cdmDatabaseId = config$cdm$cdm_database_name,
     cohortDatabaseSchema = config$cdm$target_database_schema,
     cohortTable = config$cdm$cohort_table,
     outcomeDatabaseSchema = config$cdm$target_database_schema,
@@ -99,15 +100,15 @@ getValidationDatabaseDetails <- function(connectionDetails, config, logger){
     databaseDetails <- createDatabaseDetails(
       connectionDetails = connectionDetails,
       cdmDatabaseSchema = config$cdm$cdm_database_schema,
-      cdmDatabaseName = config$cdm$cdm_database_name,
+      cdmDatabaseName = paste0(config$cdm$cdm_database_name, validationCohortNames[as.character(cohortId)], cohortId),
+      cdmDatabaseId = paste0(config$cdm$cdm_database_name, validationCohortNames[as.character(cohortId)], cohortId),
       cohortDatabaseSchema = config$cdm$target_database_schema,
       cohortTable = config$cdm$cohort_table,
       outcomeDatabaseSchema = config$cdm$target_database_schema,
       outcomeTable = config$cdm$cohort_table,
       targetId = cohortId,
       outcomeIds = config$cdm$outcome_cohort_id,
-      cdmVersion = 5,
-      databaseDetailsName = paste0(config$cdm$cdm_database_name, validationCohortNames[as.character(cohortId)], cohortId)
+      cdmVersion = 5
     )
     databaseDetailsList[[length(databaseDetailsList) + 1]] <- databaseDetails
   }

@@ -157,6 +157,39 @@ getModelDesignList <- function(config){
   return(modelDesignList[config$run$models])
 }
 
+regenerateSqlite <- function(saveDirectoryDev, saveDirectoryValidation){
+  unlink(file.path(getwd(), "PlpMultiOutput", "sqlite"), recursive = T)
+  sqliteLocation <- file.path(saveDirectoryDev, 'sqlite')
+  insertResultsToSqlite(
+    resultLocation = saveDirectoryDev,
+    cohortDefinitions = NULL,
+    databaseList = PatientLevelPrediction::createDatabaseList(
+      cdmDatabaseSchemas = c(saveDirectoryDev, saveDirectoryValidation)
+    ),
+    sqliteLocation = sqliteLocation
+  )
+}
+
+
+exportResultsToCsv <- function(){
+  unlink(file.path(getwd(), "PlpMultiOutput", "csv"), recursive = T)
+  
+  PatientLevelPrediction::extractDatabaseToCsv(
+    connectionDetails = DatabaseConnector::createConnectionDetails(
+      server = file.path(getwd(), "PlpMultiOutput", "sqlite", "databaseFile.sqlite"), 
+      dbms = "sqlite"
+    ), 
+    databaseSchemaSettings = PatientLevelPrediction::createDatabaseSchemaSettings(
+      resultSchema = "main", 
+      tablePrefix = "", 
+      targetDialect = "sqlite"
+    ), 
+    csvFolder = file.path(getwd(), "PlpMultiOutput", "csv")
+  )
+}
+
+
+
 runMultiplePrediction <- function(config, logger) {
   connectionDetails <- getConnectionDetails(config, logger)
   databaseDetails <- getDatabaseDetails(connectionDetails, config, logger)
@@ -166,8 +199,10 @@ runMultiplePrediction <- function(config, logger) {
     modelDesignList = getModelDesignList(config),
     onlyFetchData = F,
     logSettings = createLogSettings(),
-    saveDirectory =  file.path(getwd(), "PlpMultiOutput")
+    saveDirectory = file.path(getwd(), "PlpMultiOutput")
   )
+  
+  exportResultsToCsv()
 }
 
 runExternalValiadtion <- function(config, logger){
@@ -179,9 +214,9 @@ runExternalValiadtion <- function(config, logger){
     validationRestrictPlpDataSettings = createRestrictPlpDataSettings(),
     recalibrate = NULL
   )
+
+  exportResultsToCsv()
 }
-
-
 
 
 

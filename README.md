@@ -37,11 +37,11 @@ PORPOISE is being developed in R Studio using the OHDSI [PatientLevelPrediction]
 - RStudio 2022.02.0
 - JAVA
 - RTools
-- PatientLevelPrediction R package version 5.4.5
+- PatientLevelPrediction R package version 6.0.4
 - FeatureExtraction R package version 3.2.0
-- DatabaseConnector R package version 5.0.4
-- OhdsiShinyModules R package version 0.2.3
-- SqlRender R package version 1.9.2
+- DatabaseConnector R package version 5.1.0
+- OhdsiShinyModules R package version 1.0.0
+- SqlRender R package version 1.10.0
 - cdm version >=5.0.0
 
 ## Installation
@@ -54,24 +54,19 @@ The prediction module requires [PatientLevelPrediction](https://github.com/OHDSI
 - `Xcode command line tools` for Mac and Linux users 
 
 To install all the above requirements, please follow the instructions in the [R setup](https://ohdsi.github.io/Hades/rSetup.html) document provided by the OHDSI [HADES](https://ohdsi.github.io/Hades/index.html) team.
-After setting up the R environment, you can install the PLP package as follows ([more information](https://github.com/OHDSI/PatientLevelPrediction/blob/main/inst/doc/InstallationGuide.pdf)). Because the latest version of the PLP package (5.4.5) has not yet been released, the `develop` branch is installed as shown below:
+After setting up the R environment, you can install the PLP package as follows ([more information](https://github.com/OHDSI/PatientLevelPrediction/blob/main/inst/doc/InstallationGuide.pdf)).
 
 ```sh
 install.packages("remotes")
-remotes::install_github("OHDSI/FeatureExtraction")
-remotes::install_github(repo = "OHDSI/OhdsiShinyModules", ref = "main")
-remotes::install_github(repo = "OHDSI/PatientLevelPrediction", ref = "develop")
+remotes::install_github("ohdsi/FeatureExtraction")
+remotes::install_github("ohdsi/OhdsiShinyModules")
+remotes::install_github("ohdsi/PatientLevelPrediction")
 ```
 
-If version 5.4.5 is made available, it can be installed as follows:
-
-```sh
-remotes::install_github("OHDSI/PatientLevelPrediction")
-```
 The `remotes` will automatically install the latest release and all the latest dependencies. To determine the version of the package, you can run:
 ```sh
-remotes::install_github("OHDSI/FeatureExtraction@v3.2.0")
-remotes::install_github("OHDSI/PatientLevelPrediction@v5.4.5")
+remotes::install_github("ohdsi/FeatureExtraction@v3.2.0")
+remotes::install_github("ohdsi/PatientLevelPrediction@v6.0.4")
 ```
 
 To install `SqlRender` and `DatabaseConnector`, run:
@@ -203,7 +198,7 @@ The default cohort table and ids are as follows. Any new cohort table with any i
 - `obesity_cohort_id`: 5
 
 #### Multiple prediction output
-By executing the multiple prediction module, the `PlpMultiOutput` folder will be created. This folder will contain five `Analysis` folders corresponding to prediction models, two target cohort folders, and a settings.csv file.
+By executing the multiple prediction module, the `PlpMultiOutput` folder will be created. This folder will contain five `Analysis` folders corresponding to prediction models, two target cohort folders, and a settings.csv file, as well as a sqlite folder containing `databaseFile.sqlite` to store all prediction results.
 
 - Each analysis folder must include:
   - `plpResult` folder, 
@@ -226,6 +221,7 @@ By executing the multiple prediction module, the `PlpMultiOutput` folder will be
   - `outcomes.rds`
   - `timeRef.rds`
 
+To share the models for external validation, partners only need to keep the content of the model folder in `./PlpMultiOutput/Analysis_*/plpResult/model` and `databaseFile.sqlite` file in `./PlpMultiOutput/sqlite` folder. You can delete all other folders and share them with us.
 
 #### External validation of pre-trained models
 To validate pre-trained models, you need to 
@@ -236,6 +232,12 @@ To validate pre-trained models, you need to
 The results of external validation will be generated in the `./PlpMultiOutput/Validation` path.
 The `Validation` folder contains four sub-folders for each cohort  id, including target and evaluation subgroups. Each cohort id folder must contain five `Analysis` folders that correspond to those created in the `PlpMultiOutput` folder.
 
+#### Reporting results
+After running the prediction module, both internal and external validation results are automatically inserted into a `databaseFile.sqlite` file in the `./PlpMultiOutput/sqlite` folder. If the sqlite file is created correctly, you will be able to see both the internal and external validation results using the Shiny app. To run the shiny app after running the prediction module, run the following code by giving the output folder path:
+```sh
+viewMultiplePlp("./PlpMultiOutput")
+```
+In addition to the sqlite file, the prediction module also exports the results through a set of CSV files in the `./PlpMultiOutput/csv` folder. To share the results, you only need to send us the `databaseFile.sqlite` file. The results do not include any PHI or high-risk data. However, the partners may review the content of the results in the csv files based on their institution's policy.
 
 ## Support
 If you require assistance with the project, please contact Dr. Behzad Naderalvojoud at behzadn[at]stanford[dot]edu or [OHDSI forum](https://forums.ohdsi.org/t/call-for-participation-in-porpoise-a-network-study-on-omop-databases/).
