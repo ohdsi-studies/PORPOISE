@@ -27,6 +27,7 @@ db:
   port: 5742
   user: "behzadn"
   password: "1111"
+  driverPath: "Path to the db driver"
 
 cdm:
   target_database_schema: "`som-nero-phi-boussard.cdm_prolonged_opioid`"

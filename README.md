@@ -75,6 +75,10 @@ To install `SqlRender` and `DatabaseConnector`, run:
 install.packages("SqlRender")
 install.packages("DatabaseConnector")
 ```
+If the CDM dataset is in BigQuery, the following package must be installed:
+```sh
+remotes::install_github("jdposada/BQJdbcConnectionStringR")
+```
 
 ## Getting Started
 The project's materials and methods are divided into the cohort and prediction studies.
@@ -139,6 +143,7 @@ For other databases, you should configure the following parameters. If the targe
 | port | Database port|
 |user| Database user name|
 | password | Database password |
+| driverPath | Path to the db driver|
 
 All the paramters related to the CDM dataset is described below:
 | `cdm` Parameter | Description |
@@ -238,6 +243,8 @@ After running the prediction module, both internal and external validation resul
 viewMultiplePlp("./PlpMultiOutput")
 ```
 In addition to the sqlite file, the prediction module also exports the results through a set of CSV files in the `./PlpMultiOutput/csv` folder. To share the results, you only need to send us the `databaseFile.sqlite` file. The results do not include any PHI or high-risk data. However, the partners may review the content of the results in the csv files based on their institution's policy.
+
+*It is worth noting that the prediction module generates an output folder called "PlpMultiOutput." As a result, when training new models or validating pre-trained models, the output folders must be managed manually to avoid overwriting.*
 
 ## Support
 If you require assistance with the project, please contact Dr. Behzad Naderalvojoud at behzadn[at]stanford[dot]edu or [OHDSI forum](https://forums.ohdsi.org/t/call-for-participation-in-porpoise-a-network-study-on-omop-databases/).

@@ -1,10 +1,10 @@
-library(BQJdbcConnectionStringR)
 library(DatabaseConnector)
 library(SqlRender)
 library(log4r)
 library(yaml)
 
 getBqConnectionDetails <- function(config){
+  library(BQJdbcConnectionStringR)
   connectionString <- createBQConnectionString(projectId = config$bq$projectId,
                                                defaultDataset = config$bq$defaultDataset,
                                                authType = 2,
