@@ -157,7 +157,7 @@ getModelDesignList <- function(config){
   return(modelDesignList[config$run$models])
 }
 
-regenerateSqlite <- function(saveDirectoryDev, saveDirectoryValidation){
+regenerateSqliteWithValidation <- function(saveDirectoryDev, saveDirectoryValidation){
   unlink(file.path(getwd(), "PlpMultiOutput", "sqlite"), recursive = T)
   sqliteLocation <- file.path(saveDirectoryDev, 'sqlite')
   insertResultsToSqlite(
@@ -165,6 +165,19 @@ regenerateSqlite <- function(saveDirectoryDev, saveDirectoryValidation){
     cohortDefinitions = NULL,
     databaseList = PatientLevelPrediction::createDatabaseList(
       cdmDatabaseSchemas = c(saveDirectoryDev, saveDirectoryValidation)
+    ),
+    sqliteLocation = sqliteLocation
+  )
+}
+
+regenerateSqlite <- function(saveDirectoryDev){
+  unlink(file.path(getwd(), "PlpMultiOutput", "sqlite"), recursive = T)
+  sqliteLocation <- file.path(saveDirectoryDev, 'sqlite')
+  insertResultsToSqlite(
+    resultLocation = saveDirectoryDev,
+    cohortDefinitions = NULL,
+    databaseList = PatientLevelPrediction::createDatabaseList(
+      cdmDatabaseSchemas = NULL
     ),
     sqliteLocation = sqliteLocation
   )

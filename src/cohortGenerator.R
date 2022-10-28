@@ -1,4 +1,3 @@
-library(BQJdbcConnectionStringR)
 library(DatabaseConnector)
 library(SqlRender)
 library(log4r)
