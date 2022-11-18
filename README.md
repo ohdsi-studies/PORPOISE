@@ -20,7 +20,7 @@ The PORPOISE study develops and validates machine learning (ML) models to predic
 ## Objectives
 
 - Improve pain management following surgery.
-- Identify patients at risk for prolonged opioid use prior to prescribing pain management regimes.
+- Identify patients at risk for prolonged opioid use prior to prescribing pain management regimens.
 - Develop and validate ML models in a diverse, multisite cohort by evaluating their generalizability, discrimination, and calibration abilities.
 - Evaluate the transportability of ML models based on population differences in the various CDM databases.
 
@@ -91,7 +91,7 @@ To run the cohort definition in ATLAS:
 - Go to `Export` tab
 - Go to `JSON` tab
 - Add the JSON into the text box
-- click on the `Reload` button
+- Click on the `Reload` button
 - Save the cohort
 - Go to the `Generation` tab and click on the `Generate` button
 
@@ -101,7 +101,7 @@ To run cohort characterization in ATLAS:
 - Go to `Utilities` tab
 - Go to `Import` tab
 - Add the JSON into the text box
-- click on the `Import` button
+- Click on the `Import` button
 - Save the setting
 - Go to the `Executions` tab and click on the `Generate` button
 
@@ -145,10 +145,10 @@ For other databases, you should configure the following parameters. If the targe
 | password | Database password |
 | driverPath | Path to the db driver|
 
-All the paramters related to the CDM dataset is described below:
+All the parameters related to the CDM dataset is described below:
 | `cdm` Parameter | Description |
 | ------ | ------ |
-| target_database_schema | Working schema cantaining the cohort tabe and CDM subset|
+| target_database_schema | Working schema containing the cohort table and CDM subset|
 | cohort_table | Cohort table name|
 | target_cohort_id | target cohort id|
 | outcome_cohort_id | outcome cohort id|
@@ -206,13 +206,11 @@ The default cohort table and ids are as follows. Any new cohort table with any i
 By executing the multiple prediction module, the `PlpMultiOutput` folder will be created. This folder will contain five `Analysis` folders corresponding to prediction models, two target cohort folders, and a settings.csv file, as well as a sqlite folder containing `databaseFile.sqlite` to store all prediction results.
 
 - Each analysis folder must include:
-  - `plpResult` folder, 
-  - `plpLog.txt`, 
+  - `plpLog.txt`
   - `diagnosePlp.rds`
-  - Each 'plpResult' folder must include: 
-    - `model` folder 
+  - `plpResult` folder including:
     - `runPlp.rds`
-    - Each 'model' folder must include 
+    - `model` folder including: 
       - `attributes.json`
       - `covariateImportance.csv` (only for LR)
       - `model.json` or model folder including `model.pkl` 
@@ -230,7 +228,7 @@ To share the models for external validation, partners only need to keep the cont
 
 #### External validation of pre-trained models
 To validate pre-trained models, you need to 
-- Set up the `config.yml` file, including the `db` or `bg` and `cdm` parameters for the external validation database, and set the `external_validation` and , `cohort_subgroup_generator` parameters to `Yes` (if you have already generated the subgroups, there is no need to set `cohort_subgroup_generator` to `Yes`), 
+- Set up the `config.yml` file, including the `db` or `bg` and `cdm` parameters for the external validation database, and set the `external_validation` and , `cohort_subgroup_generator` parameters to 'Yes' (if you have already generated the subgroups, there is no need to set `cohort_subgroup_generator` to 'Yes'), 
 - Place already trained results in the `PlpMultiOutput` folder,
 - Run the `main.R`.
 
@@ -244,7 +242,7 @@ viewMultiplePlp("./PlpMultiOutput")
 ```
 In addition to the sqlite file, the prediction module also exports the results through a set of CSV files in the `./PlpMultiOutput/csv` folder. To share the results, you only need to send us the `databaseFile.sqlite` file. The results do not include any PHI or high-risk data. However, the partners may review the content of the results in the csv files based on their institution's policy.
 
-*It is worth noting that the prediction module generates an output folder called "PlpMultiOutput." As a result, when training new models or validating pre-trained models, the output folders must be managed manually to avoid overwriting.*
+*It is worth noting that the prediction module generates an output folder called "PlpMultiOutput". As a result, when training new models or validating pre-trained models, the output folders must be managed manually to avoid overwriting.*
 
 ## Support
 If you require assistance with the project, please contact Dr. Behzad Naderalvojoud at behzadn[at]stanford[dot]edu or [OHDSI forum](https://forums.ohdsi.org/t/call-for-participation-in-porpoise-a-network-study-on-omop-databases/).

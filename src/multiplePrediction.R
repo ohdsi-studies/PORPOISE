@@ -225,7 +225,7 @@ runExternalValiadtion <- function(config, logger){
     analysesLocation = file.path(getwd(), "PlpMultiOutput"),
     validationDatabaseDetails = validationDatabaseDetailsList,
     validationRestrictPlpDataSettings = createRestrictPlpDataSettings(),
-    recalibrate = NULL
+    recalibrate = c("weakRecalibration", "recalibrationInTheLarge")
   )
 
   exportResultsToCsv()
