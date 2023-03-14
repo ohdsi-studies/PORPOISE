@@ -7,7 +7,7 @@
 -----------------------------
 
 The PORPOISE study develops and validates machine learning (ML) models to predict patients at risk of prolonged opioid use in a diverse, multisite cohort by evaluating not only their performance but also their generalizability, discrimination, and calibration abilities over different subgroups, including diabetes, depression, and obesity.
-- Study Protocol: [PORPOISE-Study-Protocol-V1.0.pdf](./docs/PORPOISE-Study-Protocol-V1.0.pdf)
+- Study Protocol: [PORPOISE-Study-Protocol-V2.0.pdf](./docs/PORPOISE-Study-Protocol-V2.0.pdf)
 - Preliminary Results: [Shiny App](https://prolonged-opioid-use-prediction.shinyapps.io/shiny-app/)
 - Participation Call: [OHDSI Forum](https://forums.ohdsi.org/t/call-for-participation-in-porpoise-a-network-study-on-omop-databases/)
 - Project Introduction: [Slides](https://www.ohdsi.org/wp-content/uploads/2022/08/OHDSI-PORPOISE.pdf?_ga=2.167237366.951202879.1660248827-110566673.1652651887) and [Presentation](https://youtu.be/h7Hq76NLhUo)

@@ -1,6 +1,6 @@
 library(PatientLevelPrediction)
 library(FeatureExtraction)
-library(OhdsiShinyModules)
+#library(OhdsiShinyModules)
 library(log4r)
 source("src/databaseConnection.R")
 
@@ -15,15 +15,21 @@ covariateSettings <- createCovariateSettings(
   useDrugExposureMediumTerm = TRUE,
   useMeasurementMediumTerm = TRUE,
   
-  useConditionGroupEraMediumTerm = TRUE,
+  useDrugEraMediumTerm = TRUE,
   useDrugGroupEraMediumTerm = TRUE,
+  useConditionEraMediumTerm = TRUE,
   
   useDistinctConditionCountMediumTerm = TRUE,
   useDistinctProcedureCountMediumTerm = TRUE,
   useDistinctIngredientCountMediumTerm = TRUE,
   useDistinctMeasurementCountMediumTerm = TRUE,
   
+  useDrugEraStartShortTerm = TRUE,
+  useDrugExposureShortTerm = TRUE,
+  useDistinctIngredientCountShortTerm = TRUE,
+  
   mediumTermStartDays = -180,
+  shortTermStartDays = -30,
   endDays = 0,
 )
 
@@ -54,6 +60,8 @@ splitSettings = createDefaultSplitSetting(
   splitSeed = 13
 )
 
+preprocessSettings = createPreprocessSettings(minFraction = 0.00001, normalize = TRUE, removeRedundancy = FALSE)
+
 getModelDesignList <- function(config){
   
   modelDesignLR <- createModelDesign(
@@ -69,12 +77,54 @@ getModelDesignList <- function(config){
     modelSettings = setLassoLogisticRegression()
   )
   
+  modelDesignLRwithFS <- createModelDesign(
+    targetId = config$cdm$target_cohort_id,
+    outcomeId = config$cdm$outcome_cohort_id,
+    restrictPlpDataSettings = createRestrictPlpDataSettings(),
+    populationSettings = populationSettings,
+    covariateSettings = relevantCovariateSettings,
+    featureEngineeringSettings = createFeatureEngineeringSettings(),
+    sampleSettings = sampleSettings,
+    splitSettings = splitSettings,
+    preprocessSettings = preprocessSettings,
+    modelSettings = setLassoLogisticRegression()
+  )
+  
   modelDesignRF <- createModelDesign(
     targetId = config$cdm$target_cohort_id,
     outcomeId = config$cdm$outcome_cohort_id,
     restrictPlpDataSettings = createRestrictPlpDataSettings(),
     populationSettings = populationSettings,
     covariateSettings = covariateSettings,
+    featureEngineeringSettings = createFeatureEngineeringSettings(),
+    sampleSettings = sampleSettings,
+    splitSettings = splitSettings,
+    preprocessSettings = createPreprocessSettings(),
+    modelSettings = setRandomForest(
+      ntrees = list(500),
+      criterion = list("gini"),
+      maxDepth = list(17),
+      minSamplesSplit = list(2),
+      minSamplesLeaf = list(1),
+      minWeightFractionLeaf = list(0),
+      mtries = list("auto"),
+      maxLeafNodes = list(NULL),
+      minImpurityDecrease = list(0),
+      bootstrap = list(TRUE),
+      maxSamples = list(NULL),
+      oobScore = list(FALSE),
+      nJobs = list(NULL),
+      classWeight = list(NULL),
+      seed = 13
+    )
+  )
+  
+  modelDesignRFwithFS <- createModelDesign(
+    targetId = config$cdm$target_cohort_id,
+    outcomeId = config$cdm$outcome_cohort_id,
+    restrictPlpDataSettings = createRestrictPlpDataSettings(),
+    populationSettings = populationSettings,
+    covariateSettings = relevantCovariateSettings,
     featureEngineeringSettings = createFeatureEngineeringSettings(),
     sampleSettings = sampleSettings,
     splitSettings = splitSettings,
@@ -122,7 +172,47 @@ getModelDesignList <- function(config){
     )
   )
   
+  modelDesignGBwithFS <- createModelDesign(
+    targetId = config$cdm$target_cohort_id,
+    outcomeId = config$cdm$outcome_cohort_id,
+    restrictPlpDataSettings = createRestrictPlpDataSettings(),
+    populationSettings = populationSettings,
+    covariateSettings = relevantCovariateSettings,
+    featureEngineeringSettings = createFeatureEngineeringSettings(),
+    sampleSettings = sampleSettings,
+    splitSettings = splitSettings,
+    preprocessSettings = createPreprocessSettings(),
+    modelSettings = setGradientBoostingMachine(
+      ntrees = c(300),
+      nthread = 20,
+      earlyStopRound = 25,
+      maxDepth = c(4),
+      minChildWeight = 1,
+      learnRate = c(0.1),
+      scalePosWeight = 1,
+      lambda = 1,
+      alpha = 0,
+      seed = 13
+    )
+  )
+  
   modelDesignAB <- createModelDesign(
+    targetId = config$cdm$target_cohort_id,
+    outcomeId = config$cdm$outcome_cohort_id,
+    restrictPlpDataSettings = createRestrictPlpDataSettings(),
+    populationSettings = populationSettings,
+    covariateSettings = covariateSettings,
+    featureEngineeringSettings = createFeatureEngineeringSettings(),
+    sampleSettings = sampleSettings,
+    splitSettings = splitSettings,
+    preprocessSettings = createPreprocessSettings(),
+    modelSettings = setAdaBoost(
+      nEstimators = list(50),
+      learningRate = list(1)
+    )
+  )
+  
+  modelDesignABwithFS <- createModelDesign(
     targetId = config$cdm$target_cohort_id,
     outcomeId = config$cdm$outcome_cohort_id,
     restrictPlpDataSettings = createRestrictPlpDataSettings(),
@@ -143,6 +233,19 @@ getModelDesignList <- function(config){
     outcomeId = config$cdm$outcome_cohort_id,
     restrictPlpDataSettings = createRestrictPlpDataSettings(),
     populationSettings = populationSettings,
+    covariateSettings = covariateSettings,
+    featureEngineeringSettings = createFeatureEngineeringSettings(),
+    sampleSettings = sampleSettings,
+    splitSettings = splitSettings,
+    preprocessSettings = createPreprocessSettings(),
+    modelSettings = setNaiveBayes()
+  )
+  
+  modelDesignNBwithFS <- createModelDesign(
+    targetId = config$cdm$target_cohort_id,
+    outcomeId = config$cdm$outcome_cohort_id,
+    restrictPlpDataSettings = createRestrictPlpDataSettings(),
+    populationSettings = populationSettings,
     covariateSettings = relevantCovariateSettings,
     featureEngineeringSettings = createFeatureEngineeringSettings(),
     sampleSettings = sampleSettings,
@@ -151,8 +254,9 @@ getModelDesignList <- function(config){
     modelSettings = setNaiveBayes()
   )
   
-  modelDesignList = list(modelDesignLR, modelDesignRF, modelDesignAB, modelDesignGB, modelDesignNB)
-  names(modelDesignList) = c("LR", "RF", "AB", "GB", "NB")
+  modelDesignList = list(modelDesignLR, modelDesignRF, modelDesignAB, modelDesignGB, modelDesignNB,
+                         modelDesignLRwithFS, modelDesignRFwithFS, modelDesignABwithFS, modelDesignGBwithFS, modelDesignNBwithFS)
+  names(modelDesignList) = c("LR", "RF", "AB", "GB", "NB", "LRFS", "RFFS", "ABFS", "GBFS", "NBFS")
   
   return(modelDesignList[config$run$models])
 }

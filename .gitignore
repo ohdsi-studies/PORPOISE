@@ -50,8 +50,11 @@ rsconnect/
 *.txt
 
 # Prediction results
-PlpMultiOutput/
+PlpMultiOutput*/
 PlpPlots/
 
 # Shiny app
 shiny-app/
+
+#fs
+fs/*.csv

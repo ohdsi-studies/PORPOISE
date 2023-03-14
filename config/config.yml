@@ -27,18 +27,17 @@ db:
   port: 5742
   user: "behzadn"
   password: "1111"
-  driverPath: "Path to the db driver"
 
 cdm:
-  target_database_schema: "`som-nero-phi-boussard.cdm_prolonged_opioid`"
+  target_database_schema: "`som-nero-phi-boussard.bn_porpoise`"
   cohort_table: "cohort"
   target_cohort_id: 1
   outcome_cohort_id: 2
   diabetes_cohort_id: 3
   depression_cohort_id: 4
   obesity_cohort_id: 5
-  vocabulary_database_schema: "`boussard.cdm_prolonged_opioid`"
-  cdm_database_schema: "`boussard.cdm_prolonged_opioid`"
+  vocabulary_database_schema: "`boussard.starr_omop_cdm5_deid_lite_2023_03_05`"
+  cdm_database_schema: "`boussard.starr_omop_cdm5_deid_lite_2023_03_05`"
   cdm_database_name: "STARR-OMOP"
 
 
