@@ -128,7 +128,7 @@ getModelDesignList <- function(config){
     featureEngineeringSettings = createFeatureEngineeringSettings(),
     sampleSettings = sampleSettings,
     splitSettings = splitSettings,
-    preprocessSettings = createPreprocessSettings(),
+    preprocessSettings = preprocessSettings,
     modelSettings = setRandomForest(
       ntrees = list(500),
       criterion = list("gini"),
@@ -181,7 +181,7 @@ getModelDesignList <- function(config){
     featureEngineeringSettings = createFeatureEngineeringSettings(),
     sampleSettings = sampleSettings,
     splitSettings = splitSettings,
-    preprocessSettings = createPreprocessSettings(),
+    preprocessSettings = preprocessSettings,
     modelSettings = setGradientBoostingMachine(
       ntrees = c(300),
       nthread = 20,
@@ -221,7 +221,7 @@ getModelDesignList <- function(config){
     featureEngineeringSettings = createFeatureEngineeringSettings(),
     sampleSettings = sampleSettings,
     splitSettings = splitSettings,
-    preprocessSettings = createPreprocessSettings(),
+    preprocessSettings = preprocessSettings,
     modelSettings = setAdaBoost(
       nEstimators = list(50),
       learningRate = list(1)
@@ -250,7 +250,7 @@ getModelDesignList <- function(config){
     featureEngineeringSettings = createFeatureEngineeringSettings(),
     sampleSettings = sampleSettings,
     splitSettings = splitSettings,
-    preprocessSettings = createPreprocessSettings(),
+    preprocessSettings = preprocessSettings,
     modelSettings = setNaiveBayes()
   )
   
