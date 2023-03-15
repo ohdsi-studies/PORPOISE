@@ -14,6 +14,7 @@ createCohortQueries <- function(config) {
     sql["diabetes"] <- readSql("./sql/target-cohort-diabetes.sql")
     sql["depression"] <- readSql("./sql/target-cohort-depression.sql")
     sql["obesity"] <- readSql("./sql/target-cohort-obesity.sql")
+    sql["targetNoPostCriteria"] <- readSql("./sql/target-cohort-noPostCriteria.sql")
   }
   
   cohortQueries <- list()
@@ -27,6 +28,8 @@ createCohortQueries <- function(config) {
       cohort_id <- config$cdm$depression_cohort_id
     } else if (q == "obesity") {
       cohort_id <- config$cdm$obesity_cohort_id
+    } else if (q == "targetNoPostCriteria") {
+      cohort_id <- config$cdm$targetNoPostCriteria_cohort_id
     }
     
     print(paste(q, "cohort_id is", cohort_id))

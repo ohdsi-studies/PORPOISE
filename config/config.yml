@@ -36,6 +36,7 @@ cdm:
   diabetes_cohort_id: 3
   depression_cohort_id: 4
   obesity_cohort_id: 5
+  targetNoPostCriteria_cohort_id: 6
   vocabulary_database_schema: "`boussard.starr_omop_cdm5_deid_lite_2023_03_05`"
   cdm_database_schema: "`boussard.starr_omop_cdm5_deid_lite_2023_03_05`"
   cdm_database_name: "STARR-OMOP"
