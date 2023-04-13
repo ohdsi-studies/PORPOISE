@@ -6,15 +6,15 @@ run:
   plp_output_folder_name: "PlpMultiOutput"
   feature_selection_output: "./fs/fs-chi2"
   external_validation: "Yes"
-  pretrained_models_folder_name: "PlpMultiOutput-STARR"
-  validation_subgroup: "Yes"
-  validation_noPostCriteria: "Yes"
-  only_validation_test_set: "Yes"
+  pretrained_models_folder_name: "PlpMultiOutput-Chi2-STARR-20"
+  validation_subgroup: "No"
+  validation_noPostCriteria: "No"
+  only_validation_test_set: "No"
   cohort_generator: "No"
   cohort_subgroup_generator: "No"
   cdm_subset_generator: "No"
   models:
-  - LRFS
+  - LR
 
   
 # If the target dataset is not in BQ, it must be removed from the config file. If the bg is not found, the system checks the db automatically.  
@@ -32,7 +32,7 @@ db:
   driverPath: "path to driver"
 
 cdm:
-  target_database_schema: "`som-nero-phi-boussard.bn_porpoise`"
+  target_database_schema: "`boussard.bn_porpoise`"
   cohort_table: "cohort"
   target_cohort_id: 1
   outcome_cohort_id: 2
@@ -40,10 +40,8 @@ cdm:
   depression_cohort_id: 4
   obesity_cohort_id: 5
   targetNoPostCriteria_cohort_id: 6
-  vocabulary_database_schema: "`som-rit-phi-starr-prod.starr_omop_cdm5_deid_lite_2023_03_05`"
-  cdm_database_schema: "`som-rit-phi-starr-prod.starr_omop_cdm5_deid_lite_2023_03_05`"
-  #vocabulary_database_schema: "`som-nero-phi-boussard.bn_porpoise`"
-  #cdm_database_schema: "`som-nero-phi-boussard.bn_porpoise`"
+  vocabulary_database_schema: "`starr.starr_omop_cdm5_deid_lite_2023_03_05`"
+  cdm_database_schema: "`starr.starr_omop_cdm5_deid_lite_2023_03_05`"
   cdm_database_name: "STARR-OMOP"
 
 
