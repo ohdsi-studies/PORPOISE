@@ -3,9 +3,9 @@
 # In type cohort, the prediction is not run and the cohort and cdm subset generators are run if their parameters are set to yes.
 run:
   type: "multiple"
-  plp_output_folder_name: "PlpMultiOutput"
-  feature_selection_output: "./fs/fs-chi2"
-  external_validation: "Yes"
+  plp_output_folder_name: "PlpMultiOutput-LR"
+  feature_selection_output: "./fs/fs-chi2-forTest"
+  external_validation: "No"
   pretrained_models_folder_name: "PlpMultiOutput-Chi2-STARR-20"
   validation_subgroup: "No"
   validation_noPostCriteria: "No"
