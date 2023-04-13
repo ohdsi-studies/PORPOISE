@@ -31,7 +31,7 @@ def chi1(a, b, c, d):
     :param b: # of instances of the minority class in which the given feature not occurred
     :param c: # of instances of the majority class in which the given feature occurred
     :param d: # of instances of the majority class in which the given feature not occurred
-    :return: Asymmetric Chi-square statistic value
+    :return: One-sided chi-square statistic value
     """
     if ((a + c) * (a + b)) == 0:
         metric_value = 0
@@ -46,7 +46,7 @@ def ig(a, b, c, d):
     :param b: # of instances of the minority class in which the given feature not occurred
     :param c: # of instances of the majority class in which the given feature occurred
     :param d: # of instances of the majority class in which the given feature not occurred
-    :return: Asymmetric Information Gain value
+    :return: Information Gain value
     """
     n = a + b + c + d
     if a == 0:
@@ -79,7 +79,7 @@ def ig1(a, b, c, d):
     :param b: # of instances of the minority class in which the given feature not occurred
     :param c: # of instances of the majority class in which the given feature occurred
     :param d: # of instances of the majority class in which the given not feature occurred
-    :return: Asymmetric Information Gain value
+    :return: One-sided information gain value
     """
     # if (b == 0 and d == 0):
     #   return 0
@@ -117,7 +117,7 @@ def crf(a, b, c, d):
     :param b: # of instances of the minority class in which the given feature not occurred
     :param c: # of instances of the majority class in which the given feature occurred
     :param d: # of instances of the majority class in which the given feature not occurred
-    :return: RF value
+    :return: Conditional RF value
     """
     metric_value = math.log2(2 + ((a / (a + b)) / (max(1, c) / (c + d))))
     return metric_value
@@ -129,12 +129,25 @@ def pnf(a, b, c, d):
     :param b: # of instances of the minority class in which the given feature not occurred
     :param c: # of instances of the majority class in which the given feature occurred
     :param d: # of instances of the majority class in which the given feature not occurred
-    :return: PNF value
+    :return: One-sided PNF value
     """
-    if ((a - c) * (a + c)) == 0:
-        metric_value = 0
-    else:
-        metric_value = 1 + ((a - c) / (a + c))
+    p1 = a / (a + b)
+    p2 = c / (c + d)
+    metric_value = 1 + ((p1 - p2) / (p1 + p2))
+    return metric_value
+
+
+def pnf2(a, b, c, d):
+    """
+    :param a: # of instances of the minority class in which the given feature occurred
+    :param b: # of instances of the minority class in which the given feature not occurred
+    :param c: # of instances of the majority class in which the given feature occurred
+    :param d: # of instances of the majority class in which the given feature not occurred
+    :return: Two-sided PNF value
+    """
+    p1 = a / (a + b)
+    p2 = c / (c + d)
+    metric_value = abs((p1 - p2) / (p1 + p2))
     return metric_value
 
 
@@ -144,7 +157,7 @@ def sor(a, b, c, d):
     :param b: # of instances of the minority class in which the given feature not occurred
     :param c: # of instances of the majority class in which the given feature occurred
     :param d: # of instances of the majority class in which the given feature not occurred
-    :return: PNF value
+    :return: Soft odds ratio
     """
     metric_value = (a * d) / (max(1, b) * max(1, c))
     metric_value = math.log2(2 + metric_value)
@@ -157,12 +170,14 @@ def odds_ratio(a, b, c, d):
     :param b: # of instances of the minority class in which the given feature not occurred
     :param c: # of instances of the majority class in which the given feature occurred
     :param d: # of instances of the majority class in which the given feature not occurred
-    :return: PNF value
+    :return: odds ratio
     """
     if a == 0:
-        a = 0.0000001
+        a = 0.00001
     if c == 0:
-        c = 0.0000001
+        c = 0.00001
+    if b == 0:
+        b = 1
     metric_value = (a * d) / (b * c)
     metric_value = math.log2(metric_value)
     return metric_value
@@ -190,17 +205,17 @@ def entropy(a, b, c, d):
 
 def calculate_plp_covariate_weights(df_covariate, metric_list, feature_selection_size=300, min_fs_value=None,
                                     minority_class=None, output_dir=None):
-    df_frequent_covariate = df_covariate.loc[(df_covariate['WithOutcome_CovariateCount'] > 0)
-                                             | (df_covariate['WithNoOutcome_CovariateCount'] > 0)]
-    df_count = df_frequent_covariate[['WithNoOutcome_CovariateCount', 'WithNoOutcome_CovariateMean']]\
-        .sort_values(by='WithNoOutcome_CovariateCount', ascending=False).head(1)
-    no_outcome_count = round(df_count['WithNoOutcome_CovariateCount'].iat[0] / (df_count['WithNoOutcome_CovariateMean'].iat[0]))
+    df_frequent_covariate = df_covariate.loc[(df_covariate['TrainWithOutcome_CovariateCount'] > 0)
+                                             | (df_covariate['TrainWithNoOutcome_CovariateCount'] > 0)]
+    df_count = df_frequent_covariate[['TrainWithNoOutcome_CovariateCount', 'TrainWithNoOutcome_CovariateMean']]\
+        .sort_values(by='TrainWithNoOutcome_CovariateCount', ascending=False).head(1)
+    no_outcome_count = round(df_count['TrainWithNoOutcome_CovariateCount'].iat[0] / (df_count['TrainWithNoOutcome_CovariateMean'].iat[0]))
 
-    df_count = df_frequent_covariate[['WithOutcome_CovariateCount', 'WithOutcome_CovariateMean']]\
-        .sort_values(by='WithOutcome_CovariateCount', ascending=False).head(1)
-    outcome_count = round(df_count['WithOutcome_CovariateCount'].iat[0] / (df_count['WithOutcome_CovariateMean'].iat[0]))
-    if df_frequent_covariate[['WithOutcome_CovariateCount', 'WithOutcome_CovariateMean', 'WithNoOutcome_CovariateCount',
-                    'WithNoOutcome_CovariateMean']].isnull().values.any():
+    df_count = df_frequent_covariate[['TrainWithOutcome_CovariateCount', 'TrainWithOutcome_CovariateMean']]\
+        .sort_values(by='TrainWithOutcome_CovariateCount', ascending=False).head(1)
+    outcome_count = round(df_count['TrainWithOutcome_CovariateCount'].iat[0] / (df_count['TrainWithOutcome_CovariateMean'].iat[0]))
+    if df_frequent_covariate[['TrainWithOutcome_CovariateCount', 'TrainWithOutcome_CovariateMean', 'TrainWithNoOutcome_CovariateCount',
+                    'TrainWithNoOutcome_CovariateMean']].isnull().values.any():
         print('null value in analysis id ' + df_frequent_covariate['analysisId'].iat[0])
         df_frequent_covariate.fillna(0, inplace=True)
 
@@ -208,12 +223,12 @@ def calculate_plp_covariate_weights(df_covariate, metric_list, feature_selection
         metric_func = eval(metric_name)
         if minority_class:
             metric_result = pd.Series(metric_func(row[2], outcome_count-row[2], row[1], no_outcome_count-row[1])
-                                      for row in df_frequent_covariate[['WithNoOutcome_CovariateCount',
-                                                                        'WithOutcome_CovariateCount']].itertuples())
+                                      for row in df_frequent_covariate[['TrainWithNoOutcome_CovariateCount',
+                                                                        'TrainWithOutcome_CovariateCount']].itertuples())
         else:
             metric_result = pd.Series(metric_func(row[1], no_outcome_count-row[1], row[2], outcome_count-row[2])
-                                      for row in df_frequent_covariate[['WithNoOutcome_CovariateCount',
-                                                                        'WithOutcome_CovariateCount']].itertuples())
+                                      for row in df_frequent_covariate[['TrainWithNoOutcome_CovariateCount',
+                                                                        'TrainWithOutcome_CovariateCount']].itertuples())
 
         df_frequent_covariate[metric_name] = metric_result.values
 
@@ -227,18 +242,19 @@ def calculate_plp_covariate_weights(df_covariate, metric_list, feature_selection
 
             selected_concept_ids = set.union(selected_concept_ids, set(concept_list))
 
-        return selected_concept_ids
     else:
         analysis_id = str(df_frequent_covariate['analysisId'].iat[0])
         df_frequent_covariate.sort_values(by=metric_list[-1], kind='mergesort', ascending=False, inplace=True,
                                           ignore_index=True)
-        df_frequent_covariate = df_frequent_covariate[['conceptId', 'covariateName', 'WithOutcome_CovariateCount',
-                                                       'WithOutcome_CovariateMean', 'WithNoOutcome_CovariateCount',
-                                                       'WithNoOutcome_CovariateMean'] + metric_list]
+        df_frequent_covariate = df_frequent_covariate[['conceptId', 'covariateName', 'TrainWithOutcome_CovariateCount',
+                                                       'TrainWithOutcome_CovariateMean', 'TrainWithNoOutcome_CovariateCount',
+                                                       'TrainWithNoOutcome_CovariateMean'] + metric_list]
         if minority_class:
             df_frequent_covariate.to_csv(os.path.join(output_dir, analysis_id + '-minor-class.csv'))
         else:
             df_frequent_covariate.to_csv(os.path.join(output_dir, analysis_id + '-major-class.csv'))
+
+    return selected_concept_ids
 
 
 def evaluate_plp_covariate(file, output_dir, metric_list, fs_size=None, min_fs_value=None, minority_class=True,
@@ -247,6 +263,8 @@ def evaluate_plp_covariate(file, output_dir, metric_list, fs_size=None, min_fs_v
     df_groups = df_covariate.groupby('analysisId')
     selected_concept_ids = set()
     for group in df_groups:
+        #if group[0] > 900:
+        #    continue
         if fs_size is None and min_fs_value is None:
             calculate_plp_covariate_weights(group[1], metric_list, minority_class=minority_class, output_dir=output_dir)
         else:
@@ -278,8 +296,25 @@ def evaluate_plp_covariate(file, output_dir, metric_list, fs_size=None, min_fs_v
             fs_file.write('\n'.join([str(i) for i in selected_concept_ids]))
 
 
-def run_feature_selection(covariate_summary_csv='./plp-covariate/allCovariateSummary.csv', output_dir='./plp-covariate',
-                          fs_file_name='fs-pnf'):
-    evaluate_plp_covariate(covariate_summary_csv, output_dir, ['pnf'], fs_size=None, min_fs_value=1, minority_class=True,
-                           fs_file_name=fs_file_name)
+def run_all_metrics(covariate_summary_csv='./plp-covariate/allCovariateSummary-porpoise.csv', output_dir='./plp-covariate/evaluation_on_train_fix',
+                          fs_file_name='fs-all-train'):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    evaluate_plp_covariate(covariate_summary_csv, output_dir, ['chi2', 'pnf'], minority_class=True)
+
+
+def run_feature_selection(covariate_summary_csv='./plp-covariate/allCovariateSummary-porpoise.csv', metric_name='chi2', output_dir='./plp-covariate/fs-fix', fs_file_name='fs-chi2-min7-train'):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    metric_name = str.lower(metric_name.strip())
+    if metric_name != 'pnf' and metric_name != 'chi2':
+        print('Error: Only the chi2 and pnf metrics are permitted!')
+        return
+    else:
+        min_value = 7
+        if metric_name == 'pnf':
+            min_value = 1.5
+    
+        evaluate_plp_covariate(covariate_summary_csv, output_dir, [metric_name], fs_size=None, min_fs_value=min_value, minority_class=True, fs_file_name=fs_file_name)
+        print('Features were successfully selected by the {} metric.'.format(metric_name))
 

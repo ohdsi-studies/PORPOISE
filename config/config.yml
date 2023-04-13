@@ -3,30 +3,33 @@
 # In type cohort, the prediction is not run and the cohort and cdm subset generators are run if their parameters are set to yes.
 run:
   type: "multiple"
-  external_validation: "No"
-  validation_subgroup: "No"
+  plp_output_folder_name: "PlpMultiOutput"
+  feature_selection_output: "./fs/fs-chi2"
+  external_validation: "Yes"
+  pretrained_models_folder_name: "PlpMultiOutput-STARR"
+  validation_subgroup: "Yes"
+  validation_noPostCriteria: "Yes"
+  only_validation_test_set: "Yes"
   cohort_generator: "No"
   cohort_subgroup_generator: "No"
   cdm_subset_generator: "No"
   models:
-  - LR
-  - RF
-  - AB
-  - GB
-  - NB
+  - LRFS
+
   
 # If the target dataset is not in BQ, it must be removed from the config file. If the bg is not found, the system checks the db automatically.  
 bq:
   credentials: "/Users/behzadn/.config/gcloud/application_default_credentials.json"
   driverPath: "/Users/behzadn/SimbaJDBCDriverforGoogleBigQuery42_1.2.22.1026"
-  projectId: "boussard"
-  defaultDataset: "cdm_prolonged_opioid"
+  projectId: "som-nero-phi-boussard"
+  defaultDataset: "bn_porpoise"
 db:
   dbms: "postgresql"
   server: "localhost"
   port: 5742
   user: "behzadn"
   password: "1111"
+  driverPath: "path to driver"
 
 cdm:
   target_database_schema: "`som-nero-phi-boussard.bn_porpoise`"
@@ -37,8 +40,10 @@ cdm:
   depression_cohort_id: 4
   obesity_cohort_id: 5
   targetNoPostCriteria_cohort_id: 6
-  vocabulary_database_schema: "`boussard.starr_omop_cdm5_deid_lite_2023_03_05`"
-  cdm_database_schema: "`boussard.starr_omop_cdm5_deid_lite_2023_03_05`"
+  vocabulary_database_schema: "`som-rit-phi-starr-prod.starr_omop_cdm5_deid_lite_2023_03_05`"
+  cdm_database_schema: "`som-rit-phi-starr-prod.starr_omop_cdm5_deid_lite_2023_03_05`"
+  #vocabulary_database_schema: "`som-nero-phi-boussard.bn_porpoise`"
+  #cdm_database_schema: "`som-nero-phi-boussard.bn_porpoise`"
   cdm_database_name: "STARR-OMOP"
 
 

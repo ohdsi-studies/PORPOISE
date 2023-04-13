@@ -3,7 +3,7 @@ library(SqlRender)
 library(log4r)
 source("src/databaseConnection.R")
 
-createCohortQueries <- function(config) {
+createCohortQueries <- function() {
   sql <- list()
   if (tolower(config$run$cohort_generator) == "yes") {
     sql["target"] <- readSql("./sql/target-cohort.sql")
@@ -47,7 +47,7 @@ createCohortQueries <- function(config) {
   return(cohortQueries)
 }
 
-createTestCohortQuery <- function(config) {
+createTestCohortQuery <- function() {
   sql <- paste(
     "SELECT cohort_definition_id, COUNT(*) AS count",
     "FROM @target_database_schema.@target_cohort_table",
@@ -62,7 +62,7 @@ createTestCohortQuery <- function(config) {
   return(sql)
 }
 
-createCohortTableQuery <- function(config) {
+createCohortTableQuery <- function() {
   sql <- readSql("./sql/cohort-table.sql")
   cohortQuery = render(
     sql,
@@ -72,19 +72,19 @@ createCohortTableQuery <- function(config) {
   return(cohortQuery)
 }
 
-generateCohorts <- function(config, logger) {
+generateCohorts <- function() {
   info(logger, paste("Database connection ..."))
-  connectionDetails = getConnectionDetails(config, logger)
+  connectionDetails = getConnectionDetails()
   connection <- connect(connectionDetails)
   
   info(logger, paste("Checking cohort table in the target schema ..."))
   sql <-
-    translate(createCohortTableQuery(config), targetDialect = connectionDetails$dbms)
+    translate(createCohortTableQuery(), targetDialect = connectionDetails$dbms)
   DatabaseConnector::executeSql(connection, sql)
   
   info(logger, paste("Cohort queries are generating ..."))
   
-  queries = createCohortQueries(config)
+  queries = createCohortQueries()
   
   for (cohortName in names(queries)) {
     print(cohortName)
@@ -104,7 +104,7 @@ generateCohorts <- function(config, logger) {
   }
   
   info(logger, paste("Target and outcome cohorts were generated. The results are as follows:"))
-  testQuery <- createTestCohortQuery(config)
+  testQuery <- createTestCohortQuery()
   testSql <-
     translate(testQuery, targetDialect = connectionDetails$dbms)
   testResult <- DatabaseConnector::querySql(connection, testSql)
@@ -114,7 +114,7 @@ generateCohorts <- function(config, logger) {
 }
 
 
-generateCdmSubset <- function(config, logger){
+generateCdmSubset <- function(){
   cdmTables = c(
     'person',
     'observation_period',
@@ -127,7 +127,7 @@ generateCdmSubset <- function(config, logger){
   )
   
   info(logger, paste("Database connection ..."))
-  connectionDetails = getConnectionDetails(config, logger)
+  connectionDetails = getConnectionDetails()
   connection <- connect(connectionDetails)
   
   for (table in cdmTables) {

@@ -119,12 +119,17 @@ All the parameters in the `run` class are described in the table below:
 | `run` Parameter | Description |
 | ------ | ------ |
 | type (including 'multiple' and 'cohort')| if it is set to 'multiple', the multiple prediction module is run. In type 'cohort', the prediction is not run and the cohort and CDM subset generators are run if their parameters are set to yes.|
+|plp_output_folder_name|The name of the output folder for running PLP multiple training when the `type` parameter is set to `multiple`. *Please do not use the name folder, which already exists. The existence of some files will not allow the PLP module to run completely, and the results will not be as expected.*|
+|feature_selection_output|Path to the feature selection output file. This file is created by running ./src/featureSelection.R|
 | external_validation (Yes/No) | If `Yes`, previously trained models will be validated on the specified CDM dataset. If the value is `No`, local training with internal validation is performed.|
+|pretrained_models_folder_name|The name of the output folder containing the pretrained models, which should be moved into the project folder to be validated in the target CDM database. This must be set if the `external_validation` parameter is set to `Yes`|
 |validation_subgroup (Yes/No)|If `Yes`, previously trained models will be validated on the target cohort as well as three subgroups: diabetes, depression, and obesity.|
+|validation_noPostCriteria (Yes/No)|If `Yes`, previously trained models will be validated on the target cohort in which all post-index criteria have been removed.|
+|only_validation_test_set (Yes/No)|If `Yes`, previously trained models will be validated on the target and subgroup cohorts in which all patients used in training have been removed. *Please note that the cohorts must be created first by running ./src/createTestSetCohorts.R*|
 | cohort_generator (Yes/No)| If `Yes`, target and outcome cohorts will be generated prior to training. This parameter can only be set to `Yes` once. After the cohorts are generated in the first run, you no longer need to set this parameter to Yes for subsequent runs, and it can be set to `No`.|
-|cohort_subgroup_generator (Yes/No)|If `Yes`, the three subgroup cohorts are generated from the target cohort and saved in the cohort table. These sub-cohorts will be used only in external validation.|
-| cdm_subset_generator (Yes/No)|Because some CDM tables are big and are maintained in the cloud with a query charge, you can create a subset of clinical tables in a working schema (determined as `target_database_schema` in the config file). If it is set to `Yes`, a subset of CDM tables with records related to the subjects in the target cohort is created. Furthermore, feature extraction necessitates the creation of temporal tables in order to extract the required covariates, which may be prohibited by the CDM schema. Hence, we generate a subset of CDM in a `target_database_schema`.|
-|models (LR, RF, AB, GB, NB)| This parameter indicates all models included in the multiple prediction module. It includes 'LR' (Lasso Logistic Regression), 'RF' (Random Forest), 'AB' (AdaBoost), 'GB' (Gradient Boosting Machine), and 'NB' (Naive Bayes).|
+|cohort_subgroup_generator (Yes/No)|If `Yes`, the three subgroup cohorts are generated from the target cohort and saved in the cohort table. These sub-cohorts will be used for model validation.|
+| cdm_subset_generator (Yes/No)|Because some CDM tables are big and are maintained in the cloud with a query charge, you can create a subset of clinical tables in a working schema (determined as `target_database_schema` in the config file). If it is set to `Yes`, a subset of CDM tables with records related to the subjects in the target cohort is created.|
+|models (LR, RF, AB, GB, NB)| This parameter indicates all models included in the multiple prediction module. It includes 'LR' (Lasso Logistic Regression), 'RF' (Random Forest), 'AB' (AdaBoost), 'GB' (Gradient Boosting Machine), and 'NB' (Naive Bayes). The same models can be run using features previously selected. To this end, you should first run `./src/featureSelection.R` and set this parameter as LRFS, RFFS, ABFS, GBFS, and NBFS.|
 
 Some CDM data warehouses, e.g., BigQuery, require credentials for access. If you use BQ, you must configure all of the following parameters.
 
@@ -135,7 +140,7 @@ Some CDM data warehouses, e.g., BigQuery, require credentials for access. If you
 | projectId | Project name |
 | defaultDataset | Working dataset name |
 
-For other databases, you should configure the following parameters. If the target dataset is not in BQ, it must be removed from the config file. If the `bg` is not found, the system checks the `db` automatically. 
+For other databases, you should configure the following parameters. If the target dataset is not in BQ, it must be removed from the config file. If the `bg` is not found, the system checks the `db` automatically. You can directly modify the `getDbConnectionDetails()` function in `./src/databaseConnection.R` according to your target database settings.
 | `db` Parameter | Description |
 | ------ | ------ |
 | dbms | The dbms name, e.g., `postgresql`|
@@ -148,22 +153,22 @@ For other databases, you should configure the following parameters. If the targe
 All the parameters related to the CDM dataset is described below:
 | `cdm` Parameter | Description |
 | ------ | ------ |
-| target_database_schema | Working schema containing the cohort table and CDM subset|
-| cohort_table | Cohort table name|
+| target_database_schema | working schema containing the cohort table|
+| cohort_table | cohort table name|
 | target_cohort_id | target cohort id|
 | outcome_cohort_id | outcome cohort id|
 | diabetes_cohort_id | diabetes cohort id|
 | depression_cohort_id | depression cohort id|
 | obesity_cohort_id | obesity cohort id|
+| targetNoPostCriteria_cohort_id | target cohort with no post criteria id|
 | vocabulary_database_schema | CDM vocabulary database schema|
 | cdm_database_schema |CDM database schema containing all clinical tables|
 | cdm_database_name |CDM database name|
 
 
 #### Model training with internal validation 
-Before training models, you need to generate the target and outcome cohorts in the target database schema (your working schema), as well as a subset of the CDM dataset. To that end, you need to set `cohort_generator` and `cdm_subset_generator` to 'Yes' and run the `main.R` in the `src` folder.
-
-You can also set the `cohort_subgroup_generator` to 'Yes' to generate external validation subgroups for later use. The CDM subset generator only creates relevant clinical tables. You may also need to make a copy of `concept` and `concept_ancestor` in your target schema manually. To train the local models, you only need to set the `external_validation` parameter to 'No', and run the main.R as follows:
+Before training models, you need to generate the target and outcome cohorts in the target database schema (your working schema), as well as a subset of the CDM dataset. To that end, you need to set `cohort_generator` and `cohort_subgroup_generator` to 'Yes' and run the `main.R` in the `src` folder. 
+The cohort_subgroup_generator parameter generates external validation subgroups for later use. To train the local models, you only need to set the `external_validation` parameter to 'No', and run the main.R as follows:
 
 ```sh
 Rscript ./src/main.R
@@ -176,10 +181,11 @@ To only run the cohort generator, the config file should be configured as follow
 - `validation_subgroup`: "No"
 - `cohort_generator`: "Yes"
 - `cohort_subgroup_generator`: "Yes"
-- `cdm_subset_generator`: "Yes"
+- `cdm_subset_generator`: "No"
 
 To only run the multiple prediction module, the config file should be set up as follows: 
 - `type`: "multiple"
+- `plp_output_folder_name`: "<optional name, e.g. PlpMultiOutput>"
 - `external_validation`: "No"
 - `validation_subgroup`: "No"
 - `cohort_generator`: "No"
@@ -189,6 +195,7 @@ To only run the multiple prediction module, the config file should be set up as 
 To only run the external validation module, the config file should be set up as follows: 
 - `type`: "multiple"
 - `external_validation`: "Yes"
+- pretrained_models_folder_name: "<folder containing pretrained models>"
 - `validation_subgroup`: "Yes"
 - `cohort_generator`: "No"
 - `cohort_subgroup_generator`: "No"
@@ -201,6 +208,7 @@ The default cohort table and ids are as follows. Any new cohort table with any i
 - `diabetes_cohort_id`: 3
 - `depression_cohort_id`: 4
 - `obesity_cohort_id`: 5
+- `targetNoPostCriteria_cohort_id`: 6
 
 #### Multiple prediction output
 By executing the multiple prediction module, the `PlpMultiOutput` folder will be created. This folder will contain five `Analysis` folders corresponding to prediction models, two target cohort folders, and a settings.csv file, as well as a sqlite folder containing `databaseFile.sqlite` to store all prediction results.

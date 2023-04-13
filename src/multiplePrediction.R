@@ -34,7 +34,7 @@ covariateSettings <- createCovariateSettings(
 )
 
 relevantCovariateSettings <- covariateSettings
-relevantCovariateSettings$includedCovariateConceptIds = as.vector(scan(file = "./fs/fs-pnf", what = numeric(), sep = "\n"))
+relevantCovariateSettings$includedCovariateConceptIds = as.vector(scan(file = config$run$feature_selection_output, what = numeric(), sep = "\n"))
 
 populationSettings <- createStudyPopulationSettings(
   washoutPeriod = 0,
@@ -62,7 +62,7 @@ splitSettings = createDefaultSplitSetting(
 
 preprocessSettings = createPreprocessSettings(minFraction = 0.00001, normalize = TRUE, removeRedundancy = FALSE)
 
-getModelDesignList <- function(config){
+getModelDesignList <- function(){
   
   modelDesignLR <- createModelDesign(
     targetId = config$cdm$target_cohort_id,
@@ -262,7 +262,7 @@ getModelDesignList <- function(config){
 }
 
 regenerateSqliteWithValidation <- function(saveDirectoryDev, saveDirectoryValidation){
-  unlink(file.path(getwd(), "PlpMultiOutput", "sqlite"), recursive = T)
+  unlink(file.path(getwd(), config$run$plp_output_folder_name, "sqlite"), recursive = T)
   sqliteLocation <- file.path(saveDirectoryDev, 'sqlite')
   insertResultsToSqlite(
     resultLocation = saveDirectoryDev,
@@ -275,7 +275,7 @@ regenerateSqliteWithValidation <- function(saveDirectoryDev, saveDirectoryValida
 }
 
 regenerateSqlite <- function(saveDirectoryDev){
-  unlink(file.path(getwd(), "PlpMultiOutput", "sqlite"), recursive = T)
+  unlink(file.path(getwd(), config$run$plp_output_folder_name, "sqlite"), recursive = T)
   sqliteLocation <- file.path(saveDirectoryDev, 'sqlite')
   insertResultsToSqlite(
     resultLocation = saveDirectoryDev,
@@ -289,11 +289,11 @@ regenerateSqlite <- function(saveDirectoryDev){
 
 
 exportResultsToCsv <- function(){
-  unlink(file.path(getwd(), "PlpMultiOutput", "csv"), recursive = T)
+  unlink(file.path(getwd(), config$run$plp_output_folder_name, "csv"), recursive = T)
   
   PatientLevelPrediction::extractDatabaseToCsv(
     connectionDetails = DatabaseConnector::createConnectionDetails(
-      server = file.path(getwd(), "PlpMultiOutput", "sqlite", "databaseFile.sqlite"), 
+      server = file.path(getwd(), config$run$plp_output_folder_name, "sqlite", "databaseFile.sqlite"), 
       dbms = "sqlite"
     ), 
     databaseSchemaSettings = PatientLevelPrediction::createDatabaseSchemaSettings(
@@ -301,32 +301,35 @@ exportResultsToCsv <- function(){
       tablePrefix = "", 
       targetDialect = "sqlite"
     ), 
-    csvFolder = file.path(getwd(), "PlpMultiOutput", "csv")
+    csvFolder = file.path(getwd(), config$run$plp_output_folder_name, "csv")
   )
 }
 
 
-
-runMultiplePrediction <- function(config, logger) {
-  connectionDetails <- getConnectionDetails(config, logger)
-  databaseDetails <- getDatabaseDetails(connectionDetails, config, logger)
+runMultiplePrediction <- function() {
+  connectionDetails <- getConnectionDetails()
+  databaseDetails <- getDatabaseDetails(connectionDetails)
   
   results <- runMultiplePlp(
     databaseDetails = databaseDetails,
-    modelDesignList = getModelDesignList(config),
+    modelDesignList = getModelDesignList(),
     onlyFetchData = F,
     logSettings = createLogSettings(),
-    saveDirectory = file.path(getwd(), "PlpMultiOutput")
+    saveDirectory = file.path(getwd(), config$run$plp_output_folder_name)
   )
   
   exportResultsToCsv()
+  saveTestSet = 'yes'
+  if (tolower(saveTestSet) == 'yes'){
+    createTestPatientsCohort()
+  }
 }
 
-runExternalValiadtion <- function(config, logger){
-  connectionDetails <- getConnectionDetails(config, logger)
-  validationDatabaseDetailsList <- getValidationDatabaseDetails(connectionDetails, config, logger)
+runExternalValiadtion <- function(){
+  connectionDetails <- getConnectionDetails()
+  validationDatabaseDetailsList <- getValidationDatabaseDetails(connectionDetails)
   val <- validateMultiplePlp(
-    analysesLocation = file.path(getwd(), "PlpMultiOutput"),
+    analysesLocation = file.path(getwd(), config$run$pretrained_models_folder_name),
     validationDatabaseDetails = validationDatabaseDetailsList,
     validationRestrictPlpDataSettings = createRestrictPlpDataSettings(),
     recalibrate = "weakRecalibration"

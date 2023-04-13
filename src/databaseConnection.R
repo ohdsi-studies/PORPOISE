@@ -3,7 +3,7 @@ library(SqlRender)
 library(log4r)
 library(yaml)
 
-getBqConnectionDetails <- function(config){
+getBqConnectionDetails <- function(){
   library(BQJdbcConnectionStringR)
   connectionString <- createBQConnectionString(projectId = config$bq$projectId,
                                                defaultDataset = config$bq$defaultDataset,
@@ -19,7 +19,7 @@ getBqConnectionDetails <- function(config){
 }
 
 
-getDbConnectionDetails <- function(config){
+getDbConnectionDetails <- function(){
   connectionDetails <- DatabaseConnector::createConnectionDetails(dbms=config$db$dbms,
                                                                   server = config$db$server,
                                                                   port = config$db$port,
@@ -30,13 +30,13 @@ getDbConnectionDetails <- function(config){
 }
 
 
-getConnectionDetails <- function(config, logger) {
+getConnectionDetails <- function() {
   if ("bq" %in% names(config) &&
       "credentials" %in% names(config$bq)) {
-    return(getBqConnectionDetails(config))
+    return(getBqConnectionDetails())
   } else if ("db" %in% names(config) &&
              "dbms" %in% names(config$db)) {
-    return(getDbConnectionDetails(config))
+    return(getDbConnectionDetails())
   } else{
     if (!is.null(logger))
       error(logger = logger, "Missing db configuration!")
@@ -45,7 +45,7 @@ getConnectionDetails <- function(config, logger) {
   }
 }
 
-getDatabaseDetails <- function(connectionDetails, config, logger){
+getDatabaseDetails <- function(connectionDetails){
   if ("cdm" %in% names(config) == FALSE ||
       "target_database_schema" %in% names(config$cdm) == FALSE || 
       "cohort_table" %in% names(config$cdm) == FALSE) {
@@ -73,7 +73,7 @@ getDatabaseDetails <- function(connectionDetails, config, logger){
   return(databaseDetails)
 }
 
-getValidationDatabaseDetails <- function(connectionDetails, config, logger){
+getValidationDatabaseDetails <- function(connectionDetails){
   if ("cdm" %in% names(config) == FALSE ||
       "target_database_schema" %in% names(config$cdm) == FALSE || 
       "cohort_table" %in% names(config$cdm) == FALSE) {
@@ -82,39 +82,49 @@ getValidationDatabaseDetails <- function(connectionDetails, config, logger){
     }
     stop("Missing CDM database details in config file!")
   }
+  test_suffix = ''
+  if (tolower(config$run$only_validation_test_set) == "yes"){
+    config$cdm$target_cohort_id <- config$cdm$target_cohort_id * 10
+    config$cdm$diabetes_cohort_id <- config$cdm$diabetes_cohort_id * 10
+    config$cdm$depression_cohort_id <- config$cdm$depression_cohort_id * 10
+    config$cdm$obesity_cohort_id <- config$cdm$obesity_cohort_id * 10
+    config$cdm$targetNoPostCriteria_cohort_id <- config$cdm$targetNoPostCriteria_cohort_id * 10
+    test_suffix <- "testset-"
+  }
   
-  validationCohortNames <- list("-target-cohort-id-")
-  names(validationCohortNames) = c(config$cdm$target_cohort_id)
+  validationCohortNames <- list()
+  validationCohortNames[[as.character(config$cdm$target_cohort_id)]] <- paste0("-target-cohort-", test_suffix)
   
-  validationCohortIds <- c(config$cdm$target_cohort_id)
   if (tolower(config$run$validation_subgroup) == "yes"){
-    validationCohortIds <- c(validationCohortIds, config$cdm$diabetes_cohort_id)
-    validationCohortIds <- c(validationCohortIds, config$cdm$depression_cohort_id)
-    validationCohortIds <- c(validationCohortIds, config$cdm$obesity_cohort_id)
-    
-    validationCohortNames <- list("-target-cohort-id-", "-diabetes-cohort-id-", "-depression-cohort-id-", "-obesity-cohort-id-")
-    names(validationCohortNames) = c(config$cdm$target_cohort_id, config$cdm$diabetes_cohort_id, config$cdm$depression_cohort_id, config$cdm$obesity_cohort_id)
+    validationCohortNames[[as.character(config$cdm$diabetes_cohort_id)]] <- paste0("-diabetes-cohort-", test_suffix)
+    validationCohortNames[[as.character(config$cdm$depression_cohort_id)]] <- paste0("-depression-cohort-", test_suffix)
+    validationCohortNames[[as.character(config$cdm$obesity_cohort_id)]] <- paste0("-obesity-cohort-", test_suffix)
+  }
+  
+  if (tolower(config$run$validation_noPostCriteria) == "yes"){
+    validationCohortNames[[as.character(config$cdm$targetNoPostCriteria_cohort_id)]] <- paste0("-noPostCriteria-cohort-", test_suffix)
   }
   
   databaseDetailsList <- list()
-  for (cohortId in validationCohortIds){
+  for (cohortId in names(validationCohortNames)){
     databaseDetails <- createDatabaseDetails(
       connectionDetails = connectionDetails,
       cdmDatabaseSchema = config$cdm$cdm_database_schema,
-      cdmDatabaseName = paste0(config$cdm$cdm_database_name, validationCohortNames[as.character(cohortId)], cohortId),
-      cdmDatabaseId = paste0(config$cdm$cdm_database_name, validationCohortNames[as.character(cohortId)], cohortId),
+      cdmDatabaseName = paste0(config$cdm$cdm_database_name, validationCohortNames[[cohortId]], cohortId),
+      cdmDatabaseId = paste0(config$cdm$cdm_database_name, validationCohortNames[[cohortId]], cohortId),
       tempEmulationSchema = config$cdm$target_database_schema,
       cohortDatabaseSchema = config$cdm$target_database_schema,
       cohortTable = config$cdm$cohort_table,
       outcomeDatabaseSchema = config$cdm$target_database_schema,
       outcomeTable = config$cdm$cohort_table,
-      targetId = cohortId,
+      targetId = as.integer(cohortId),
       outcomeIds = config$cdm$outcome_cohort_id,
       cdmVersion = 5
     )
     databaseDetailsList[[length(databaseDetailsList) + 1]] <- databaseDetails
   }
-
+ 
+  config <- yaml::yaml.load_file('./config/config.yml')
   class(databaseDetailsList) <- "list"
   return(databaseDetailsList)
 }

@@ -529,7 +529,7 @@ FROM
 
 -- End Condition Occurrence Criteria
 
-) A on A.person_id = P.person_id  AND A.START_DATE <= DATEADD(day,180,P.START_DATE) ) cc 
+) A on A.person_id = P.person_id  AND A.START_DATE <= DATEADD(day,0,P.START_DATE) ) cc 
 GROUP BY cc.person_id, cc.event_id
 HAVING COUNT(cc.event_id) >= 1
 -- End Correlated Criteria
@@ -554,7 +554,7 @@ JOIN #Codesets cs on (de.drug_concept_id = cs.concept_id and cs.codeset_id = 4)
 
 -- End Drug Exposure Criteria
 
-) A on A.person_id = P.person_id  AND A.START_DATE <= DATEADD(day,180,P.START_DATE) ) cc 
+) A on A.person_id = P.person_id  AND A.START_DATE <= DATEADD(day,0,P.START_DATE) ) cc 
 GROUP BY cc.person_id, cc.event_id
 HAVING COUNT(cc.event_id) >= 1
 -- End Correlated Criteria
@@ -579,7 +579,7 @@ WHERE (C.value_as_number >= 6.5000 and C.value_as_number <= 20.0000)
 AND C.unit_concept_id in (8554)
 -- End Measurement Criteria
 
-) A on A.person_id = P.person_id  AND A.START_DATE <= DATEADD(day,180,P.START_DATE) ) cc 
+) A on A.person_id = P.person_id  AND A.START_DATE <= DATEADD(day,0,P.START_DATE) ) cc 
 GROUP BY cc.person_id, cc.event_id
 HAVING COUNT(cc.event_id) >= 1
 -- End Correlated Criteria
