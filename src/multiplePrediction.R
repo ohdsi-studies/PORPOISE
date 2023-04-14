@@ -317,12 +317,7 @@ runMultiplePrediction <- function() {
     logSettings = createLogSettings(),
     saveDirectory = file.path(getwd(), config$run$plp_output_folder_name)
   )
-  
   exportResultsToCsv()
-  saveTestSet = 'yes'
-  if (tolower(saveTestSet) == 'yes'){
-    createTestPatientsCohort()
-  }
 }
 
 runExternalValiadtion <- function(){
@@ -334,7 +329,6 @@ runExternalValiadtion <- function(){
     validationRestrictPlpDataSettings = createRestrictPlpDataSettings(),
     recalibrate = "weakRecalibration"
   )
-
   exportResultsToCsv()
 }
 
