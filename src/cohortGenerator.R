@@ -73,42 +73,39 @@ createCohortTableQuery <- function() {
 }
 
 generateCohorts <- function() {
-  info(logger, paste("Database connection ..."))
+  print("Database connection ...")
   connectionDetails = getConnectionDetails()
   connection <- connect(connectionDetails)
   
-  info(logger, paste("Checking cohort table in the target schema ..."))
+  print("Checking cohort table in the target schema ...")
   sql <-
     translate(createCohortTableQuery(), targetDialect = connectionDetails$dbms)
   DatabaseConnector::executeSql(connection, sql)
   
-  info(logger, paste("Cohort queries are generating ..."))
+  print("Cohort queries are generating ...")
   
   queries = createCohortQueries()
   
   for (cohortName in names(queries)) {
     print(cohortName)
-    info(logger,
-         paste(cohortName, "cohort query is translating ..."))
+    print(paste(cohortName, "cohort query is translating ..."))
     sql <-
       translate(queries[[cohortName]], targetDialect = connectionDetails$dbms)
     
-    info(logger, paste(cohortName, "cohort is running ..."))
+    print(paste(cohortName, "cohort is running ..."))
     res_time <- system.time(DatabaseConnector::executeSql(connection, sql))
-    info(logger,
-         sprintf(
-           "%s cohort was generated in %.3f minutes.",
-           cohortName,
-           res_time[3] / 60
-         ))
+    sprintf(
+     "%s cohort was generated in %.3f minutes.",
+     cohortName,
+     res_time[3] / 60
+    )
   }
   
-  info(logger, paste("Target and outcome cohorts were generated. The results are as follows:"))
+  print("Target and outcome cohorts were generated. The results are as follows:")
   testQuery <- createTestCohortQuery()
   testSql <-
     translate(testQuery, targetDialect = connectionDetails$dbms)
   testResult <- DatabaseConnector::querySql(connection, testSql)
-  info(logger, testResult)
   print(testResult)
   disconnect(connection = connection)
 }
@@ -126,12 +123,12 @@ generateCdmSubset <- function(){
     'drug_era'
   )
   
-  info(logger, paste("Database connection ..."))
+  print("Database connection ...")
   connectionDetails = getConnectionDetails()
   connection <- connect(connectionDetails)
   
   for (table in cdmTables) {
-    info(logger, sprintf("A subset of Table %s is generating ...", table))
+    sprintf("A subset of Table %s is generating ...", table)
     
     query <- "
     CREATE OR REPLACE TABLE @target_database_schema.@cdm_table AS

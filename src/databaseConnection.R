@@ -38,9 +38,6 @@ getConnectionDetails <- function() {
              "dbms" %in% names(config$db)) {
     return(getDbConnectionDetails())
   } else{
-    if (!is.null(logger))
-      error(logger = logger, "Missing db configuration!")
-    
     stop("Missing db configuration!")
   }
 }
@@ -49,9 +46,6 @@ getDatabaseDetails <- function(connectionDetails){
   if ("cdm" %in% names(config) == FALSE ||
       "target_database_schema" %in% names(config$cdm) == FALSE || 
       "cohort_table" %in% names(config$cdm) == FALSE) {
-    if (is.null(logger) == FALSE){
-      error(logger, "Missing CDM database details in config file!")
-    }
     stop("Missing CDM database details in config file!")
   }
   
@@ -77,9 +71,7 @@ getValidationDatabaseDetails <- function(connectionDetails){
   if ("cdm" %in% names(config) == FALSE ||
       "target_database_schema" %in% names(config$cdm) == FALSE || 
       "cohort_table" %in% names(config$cdm) == FALSE) {
-    if (is.null(logger) == FALSE){
-      error(logger, "Missing CDM database details in config file!")
-    }
+
     stop("Missing CDM database details in config file!")
   }
   test_suffix = ''
