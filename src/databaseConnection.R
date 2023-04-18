@@ -1,7 +1,5 @@
 library(DatabaseConnector)
 library(SqlRender)
-library(log4r)
-library(yaml)
 
 getBqConnectionDetails <- function(){
   library(BQJdbcConnectionStringR)

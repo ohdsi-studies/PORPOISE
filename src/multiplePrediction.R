@@ -1,7 +1,7 @@
 library(PatientLevelPrediction)
 library(FeatureExtraction)
 #library(OhdsiShinyModules)
-library(log4r)
+
 source("src/databaseConnection.R")
 
 covariateSettings <- createCovariateSettings(

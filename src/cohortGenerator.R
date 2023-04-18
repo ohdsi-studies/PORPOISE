@@ -1,6 +1,6 @@
 library(DatabaseConnector)
 library(SqlRender)
-library(log4r)
+
 source("src/databaseConnection.R")
 
 createCohortQueries <- function() {
