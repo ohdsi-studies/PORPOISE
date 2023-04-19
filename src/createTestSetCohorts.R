@@ -1,9 +1,8 @@
+config <- yaml::yaml.load_file('./config/config.yml')
 source("src/multiplePrediction.R")
 
 # Set the path to the targetId_1_L1 folder obtained from running logistic regression with all covariates.
 plpDataFolder <- file.path(getwd(), "PlpMultiOutput-LR", "targetId_1_L1")
-
-config <- yaml::yaml.load_file('./config/config.yml')
 
 createSplitData <- function(){
   if (dir.exists(plpDataFolder)){
