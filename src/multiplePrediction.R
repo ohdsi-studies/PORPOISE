@@ -288,12 +288,12 @@ regenerateSqlite <- function(saveDirectoryDev){
 }
 
 
-exportResultsToCsv <- function(){
-  unlink(file.path(getwd(), config$run$plp_output_folder_name, "csv"), recursive = T)
+exportResultsToCsv <- function(plp_output_folder_name){
+  unlink(file.path(getwd(), plp_output_folder_name, "csv"), recursive = T)
   
   PatientLevelPrediction::extractDatabaseToCsv(
     connectionDetails = DatabaseConnector::createConnectionDetails(
-      server = file.path(getwd(), config$run$plp_output_folder_name, "sqlite", "databaseFile.sqlite"), 
+      server = file.path(getwd(), plp_output_folder_name, "sqlite", "databaseFile.sqlite"), 
       dbms = "sqlite"
     ), 
     databaseSchemaSettings = PatientLevelPrediction::createDatabaseSchemaSettings(
@@ -301,7 +301,7 @@ exportResultsToCsv <- function(){
       tablePrefix = "", 
       targetDialect = "sqlite"
     ), 
-    csvFolder = file.path(getwd(), config$run$plp_output_folder_name, "csv")
+    csvFolder = file.path(getwd(), plp_output_folder_name, "csv")
   )
 }
 
@@ -317,7 +317,7 @@ runMultiplePrediction <- function() {
     logSettings = createLogSettings(),
     saveDirectory = file.path(getwd(), config$run$plp_output_folder_name)
   )
-  exportResultsToCsv()
+  exportResultsToCsv(config$run$plp_output_folder_name)
 }
 
 runExternalValiadtion <- function(){
@@ -329,7 +329,7 @@ runExternalValiadtion <- function(){
     validationRestrictPlpDataSettings = createRestrictPlpDataSettings(),
     recalibrate = "weakRecalibration"
   )
-  exportResultsToCsv()
+  exportResultsToCsv(config$run$pretrained_models_folder_name)
 }
 
 
