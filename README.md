@@ -6,28 +6,31 @@
 
 -----------------------------
 
-The PORPOISE study develops and validates machine learning (ML) models to predict patients at risk of prolonged opioid use in a diverse, multisite cohort by evaluating not only their performance but also their generalizability, discrimination, and calibration abilities over different subgroups, including diabetes, depression, and obesity.
-- Study Protocol: [PORPOISE-Study-Protocol-V2.0.pdf](./docs/PORPOISE-Study-Protocol-V2.0.pdf)
-- Preliminary Results: [Shiny App](https://prolonged-opioid-use-prediction.shinyapps.io/shiny-app/)
-- Participation Call: [OHDSI Forum](https://forums.ohdsi.org/t/call-for-participation-in-porpoise-a-network-study-on-omop-databases/)
-- Project Introduction: [Slides](https://www.ohdsi.org/wp-content/uploads/2022/08/OHDSI-PORPOISE.pdf?_ga=2.167237366.951202879.1660248827-110566673.1652651887) and [Presentation](https://youtu.be/h7Hq76NLhUo)
-- Oral Paper Presentations: 
+The PORPOISE (PostOpeRative Prolonged OpioId uSE) study develops and validates machine learning (ML) models to predict patients at risk of prolonged opioid use in a diverse, multisite cohort by evaluating not only their performance but also their generalizability, discrimination, and calibration abilities over different subgroups, including diabetes, depression, and obesity.
+
+*___This study has been validated in four countries, and all internal and external validation results will soon be available via a Shiny app.*
+
+*___As soon as the study paper is published, all pre-trained models will be made available on this GitHub page for future validation by researchers in additional countries and comparison with other models.*
+
+- Study protocol: [PORPOISE-Study-Protocol-V2.0.pdf](./docs/PORPOISE-Study-Protocol-V2.0.pdf)
+- Preliminary results from Protocol V1.0: [Shiny App](https://prolonged-opioid-use-prediction.shinyapps.io/shiny-app/)
+- Final external validation results: [Shiny app will be available soon]()
+- Participation call: [OHDSI Forum](https://forums.ohdsi.org/t/call-for-participation-in-porpoise-a-network-study-on-omop-databases/)
+- Project introduction: [Slides](https://www.ohdsi.org/wp-content/uploads/2022/08/OHDSI-PORPOISE.pdf?_ga=2.167237366.951202879.1660248827-110566673.1652651887) and [Presentation](https://youtu.be/h7Hq76NLhUo)
+- Oral presentations: 
   - Naderalvojoud, B., Hond, A., Shapiro, A., Coquet, J., Seto, T., Hernandez-Boussard, T. **Predicting Prolonged Opioid Use Following Surgery Using Machine Learning: Challenges and Outcomes** in *American Medical Informatics Association (AMIA) Annual Symposium*, Washington DC, 2022.
   
-  - Naderalvojoud, B. and Hernandez-Boussard, T. **Machine Learning for Predicting Patients at Risk of Prolonged Opioid Use Following Surgery** in *Observational Health Data Sciences and Informatics (OHDSI) Annual Symposium*, Rockville MD, 2022. 
+  - Naderalvojoud, B. and Hernandez-Boussard, T. **Machine Learning for Predicting Patients at Risk of Prolonged Opioid Use Following Surgery** in *Observational Health Data Sciences and Informatics.(OHDSI) Annual Symposium*, Rockville MD, 2022. 
 
- 
 ## Objectives
-
 - Improve pain management following surgery.
 - Identify patients at risk for prolonged opioid use prior to prescribing pain management regimens.
 - Develop and validate ML models in a diverse, multisite cohort by evaluating their generalizability, discrimination, and calibration abilities.
 - Evaluate the transportability of ML models based on population differences in the various CDM databases.
 
 ## Features
-- Run the multiple prediction module to train five machine learning algorithms.
-- Internal validation of the models trained on the local CDM dataset.
-- External validation of previously trained models on the given CDM databases through three subgroup cohorts.
+- Train and validate five machine learning algorithms using a multiple prediction module.
+- Externally validate pre-trained models on various CDM databases using three subgroup cohorts for diabetes, depression, and obesity.
 
 ## Development
 PORPOISE is being developed in R Studio using the OHDSI [PatientLevelPrediction](https://github.com/OHDSI/PatientLevelPrediction) R package.
@@ -37,12 +40,12 @@ PORPOISE is being developed in R Studio using the OHDSI [PatientLevelPrediction]
 - RStudio 2022.02.0
 - JAVA
 - RTools
-- PatientLevelPrediction R package version 6.0.4
-- FeatureExtraction R package version 3.2.0
-- DatabaseConnector R package version 5.1.0
-- OhdsiShinyModules R package version 1.0.0
-- SqlRender R package version 1.10.0
-- cdm version >=5.0.0
+- PatientLevelPrediction R package version >= 6.0.4
+- FeatureExtraction R package version >= 3.2.0
+- DatabaseConnector R package version >= 5.1.0
+- OhdsiShinyModules R package version >= 1.0.0
+- SqlRender R package version >= 1.10.0
+- cdm version >= 5.0.0
 
 ## Installation
 
